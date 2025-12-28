@@ -500,6 +500,10 @@ def sidebar_filters(df: pd.DataFrame) -> Filters:
 
 def page_home(df: pd.DataFrame, user_key: str, filters: Filters):
     st.title("🎌 Anime Recommender (Top 15,000)")
+    m = load_metrics()
+    if m:
+        with st.expander("Offline Evaluation Metrics (from Kaggle)"):
+            st.json(m)
     st.write(
         "Models: **Popularity/Weighted**, **TF-IDF**, **SBERT Embeddings**, **Hybrid**. "
         "Có **Realtime profile**, **User history**, **Context-aware**."
@@ -520,11 +524,6 @@ def page_home(df: pd.DataFrame, user_key: str, filters: Filters):
         for _, r in top.iterrows():
             st.divider()
             movie_card(r, show_actions=True, user_key=user_key)
-
-    m = load_metrics()
-    if m:
-        with st.expander("Offline Evaluation Metrics (from Kaggle)"):
-            st.json(m)
 
 
 def page_explore(df: pd.DataFrame, user_key: str, filters: Filters):
