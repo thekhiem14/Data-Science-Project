@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
@@ -18,7 +17,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Paths (robust, no need to change)
 # ----------------------------
 APP_DIR = Path(__file__).resolve().parent
-ROOT_DIR = APP_DIR.parent
+ROOT_DIR = APP_DIR
 ART_DIR = ROOT_DIR / "artifacts"
 FIG_DIR = ART_DIR / "figures"
 HISTORY_PATH = ART_DIR / "user_history.json"
