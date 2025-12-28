@@ -663,19 +663,31 @@ def page_history(df: pd.DataFrame, user_key: str):
 
 
 def page_eda():
-    st.header("📊 EDA Figures (from Kaggle)")
+    st.header("Exploratory Data Analysis (EDA)")
+    st.caption(
+        "Key visualizations to understand quality–popularity trade-offs "
+        "and niche patterns for recommendation."
+    )
+
     figs = [
         ("Score Distribution", FIG_DIR / "score_distribution.png"),
-        ("Top Genres", FIG_DIR / "top_genres.png"),
-        ("Top Weighted Score", FIG_DIR / "top_weighted_score.png"),
         ("Correlation Heatmap", FIG_DIR / "correlation_heatmap.png"),
+        ("Quality–Popularity Map", FIG_DIR / "quality_popularity_map.png"),
+        ("Niche Genres", FIG_DIR / "niche_genres.png"),
+        ("Top Genres", FIG_DIR / "top_genres.png"),
     ]
-    for name, p in figs:
-        st.subheader(name)
-        if p.exists():
-            st.image(str(p), use_container_width=True)
-        else:
-            st.warning(f"Missing: {p.name} (hãy chạy notebook Kaggle rồi copy artifacts/figures về local)")
+
+    # Hiển thị theo dạng grid 2 cột
+    for i in range(0, len(figs), 2):
+        cols = st.columns(2, gap="large")
+        for col, item in zip(cols, figs[i:i+2]):
+            name, p = item
+            with col:
+                st.subheader(name)
+                if p.exists():
+                    st.image(str(p), caption=name)
+                else:
+                    st.warning(f"Missing: {p.name}")
 
 
 def main():
