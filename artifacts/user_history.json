@@ -24,6 +24,38 @@
       {
         "event": "like",
         "title": "Clannad: After Story"
+      },
+      {
+        "event": "watched",
+        "title": "Sousou no Frieren"
+      },
+      {
+        "event": "watched",
+        "title": "One Piece"
+      },
+      {
+        "event": "like",
+        "title": "Hunter x Hunter (2011)"
+      },
+      {
+        "event": "like",
+        "title": "Hunter x Hunter (2011)"
+      },
+      {
+        "event": "like",
+        "title": "Hunter x Hunter (2011)"
+      },
+      {
+        "event": "dislike",
+        "title": "Hunter x Hunter (2011)"
+      },
+      {
+        "event": "like",
+        "title": "Kimi no Na wa."
+      },
+      {
+        "event": "watched",
+        "title": "Hunter x Hunter (2011)"
       }
     ],
     "context": {}

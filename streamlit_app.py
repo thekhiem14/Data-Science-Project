@@ -284,19 +284,27 @@ def build_user_profile_vector(df: pd.DataFrame, emb: Optional[np.ndarray], liked
 
 
 def recommend_from_profile_realtime(
-    df: pd.DataFrame,
-    emb: Optional[np.ndarray],
-    profile_vec: Optional[np.ndarray],
-    top_n: int,
-    filters: Optional[Filters],
-    exclude_titles: Optional[set]
+        df: pd.DataFrame,
+        emb: Optional[np.ndarray],
+        profile_vec: Optional[np.ndarray],
+        top_n: int,
+        filters: Optional[Filters],
+        exclude_titles: Optional[set]
 ) -> pd.DataFrame:
     if emb is None or profile_vec is None:
         return pd.DataFrame()
 
-    sims = emb @ profile_vec
+    # ✅ Bước 1: Căn chỉnh df và embedding để tránh lệch chỉ số
+    n = min(len(df), emb.shape[0])
+    df0 = df.iloc[:n].reset_index(drop=True)
+    E = emb[:n]
+
+    # ✅ Bước 2: Tính toán trên tập dữ liệu đã căn chỉnh
+    sims = E @ profile_vec
     order = np.argsort(-sims)
-    cand = df.iloc[order].copy()
+
+    # Sử dụng df0 thay vì df gốc để đảm bảo index khớp với E
+    cand = df0.iloc[order].copy()
     cand["sim"] = sims[order]
     cand["reason"] = "Realtime profile (mean of liked items embeddings)"
 
@@ -416,24 +424,45 @@ def page_detail(df, tfidf_matrix, tfidf, emb):
             st.image(r["image_url"], use_container_width=True)
             st.caption(r["title"])
 
+            # Thêm nút xem chi tiết cho từng item gợi ý
+            if st.button("View Detail", key=f"detail_{r['anime_id']}"):
+                st.session_state["selected_item"] = r["anime_id"]
+                st.session_state["page"] = "Detail"
+                st.rerun()  # Tải lại trang để hiển thị anime mới
+
 def recommend_from_item(df, item_id, tfidf, tfidf_matrix, emb, top_k=12):
-    if item_id not in df["anime_id"].values:
+    # 1. Căn chỉnh df và matrix để đảm bảo cùng kích thước
+    n = min(len(df), tfidf_matrix.shape[0])
+    df0 = df.iloc[:n].reset_index(drop=True)
+    M = tfidf_matrix[:n]
+
+    # 2. Kiểm tra xem item_id có tồn tại trong dữ liệu đã căn chỉnh không
+    if item_id not in df0["anime_id"].values:
         return pd.DataFrame()
 
-    idx = df.index[df["anime_id"] == item_id][0]
+    # 3. Lấy đúng index từ df0
+    idx = df0.index[df0["anime_id"] == item_id][0]
 
-    sims = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
-    sims[idx] = 0  # không recommend chính nó
+    # 4. Tính toán similarity trên ma trận đã cắt (M)
+    sims = cosine_similarity(M[idx], M).flatten()
+    sims[idx] = -1  # Không gợi ý chính nó
 
+    # 5. Lấy top kết quả
     top_idx = sims.argsort()[::-1][:top_k]
-    return df.iloc[top_idx]
+    return df0.iloc[top_idx]
+
 
 def add_history_event(user_key: str, event: str, title: str):
     h = load_history()
     u = h.get(user_key, {"events": [], "context": {}})
-    u["events"].append({"event": event, "title": title})
-    h[user_key] = u
-    save_history(h)
+
+    # Kiểm tra xem title này đã có event tương tự chưa
+    is_duplicate = any(e['event'] == event and e['title'] == title for e in u["events"])
+
+    if not is_duplicate:
+        u["events"].append({"event": event, "title": title})
+        h[user_key] = u
+        save_history(h)
 
 
 def get_user_events(user_key: str) -> List[Dict]:
