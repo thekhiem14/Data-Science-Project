@@ -24,6 +24,18 @@
       {
         "event": "watched",
         "title": "Teekyuu 5"
+      },
+      {
+        "event": "like",
+        "title": "One Piece: Episode of Merry - Mou Hitori no Nakama no Monogatari"
+      },
+      {
+        "event": "like",
+        "title": "Gegege no Kitarou: Youkai Daisensou"
+      },
+      {
+        "event": "watched",
+        "title": "Stranger: Mukou Hadan Pilot"
       }
     ],
     "context": {}

@@ -835,12 +835,25 @@ def page_eda():
     st.caption("Các biểu đồ từ notebook Kaggle (quality/popularity + matrix sparsity).")
 
     figs = [
-        ("Rating Distribution", FIG_DIR / "rating_distribution.png"),
-        ("Watched and Like distribution", FIG_DIR / "watched_liked.png"),
+        # Score distribution
+        ("Histogram: Score distribution", FIG_DIR / "hist_score.png"),
+        ("Boxplot: Score", FIG_DIR / "box_score.png"),
+        ("Violin: Score distribution", FIG_DIR / "violin_score.png"),
+
+        # Popularity vs score
+        ("Scatter + Regression: Score vs Popularity", FIG_DIR / "scatter_reg_score_members.png"),
+
+        # Ratings & implicit feedback
+        ("Rating Distribution (MyAnimeList)", FIG_DIR / "rating_distribution.png"),
+        ("Implicit Feedback Composition (Watched vs Liked)", FIG_DIR / "watched_liked.png"),
+
+        # Correlation
         ("Correlation Heatmap", FIG_DIR / "heatmap.png"),
+
+        # Matrix behavior
         ("User Activity Distribution", FIG_DIR / "user_activity_distribution.png"),
-        ("Item Popularity Distribution", FIG_DIR / "item_popularity_distribution.png"),
-        ("User–Item Heatmap (Sampled)", FIG_DIR / "sparsity_pattern.png"),
+        ("Item Popularity (Interactions per Item)", FIG_DIR / "item_popularity_distribution.png"),
+        ("User–Item Interaction Matrix (Sample)", FIG_DIR / "sparsity_pattern.png"),
     ]
 
     for i in range(0, len(figs), 2):
