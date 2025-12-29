@@ -832,8 +832,59 @@ def page_realtime_profile(df: pd.DataFrame, user_key: str):
 
 def page_eda():
     st.header("📊 Exploratory Data Analysis (EDA)")
-    st.caption("Các biểu đồ từ notebook Kaggle (quality/popularity + matrix sparsity).")
 
+    # =========================
+    # 0) LOAD DATA FOR METRICS
+    # =========================
+    df = load_data()  # dùng hàm load_data() đã có
+    n_items = len(df)
+
+    # basic stats
+    score_series = pd.to_numeric(df["score_filled"], errors="coerce")
+    avg_score = score_series.mean()
+    median_score = score_series.median()
+
+    # genres
+    if "genres" in df.columns:
+        all_genres = set()
+        for g in df["genres"].dropna().astype(str):
+            for x in g.split(","):
+                all_genres.add(x.strip())
+        n_genres = len(all_genres)
+    else:
+        n_genres = 0
+
+    # matrix stats (nếu có)
+    R, _, _ = load_matrix_bundle()
+    if R is not None:
+        n_users, n_items_matrix = R.shape
+        density = R.nnz / (n_users * n_items_matrix)
+    else:
+        n_users = None
+        density = None
+
+    # =========================
+    # 1) OVERVIEW METRICS
+    # =========================
+    st.subheader("🔎 Dataset Overview")
+
+    c1, c2, c3, c4, c5 = st.columns(5)
+
+    c1.metric("🎬 Anime items", f"{n_items:,}")
+    c2.metric("⭐ Avg score", f"{avg_score:.2f}")
+    c3.metric("📊 Median score", f"{median_score:.2f}")
+    c4.metric("🏷️ #Genres", f"{n_genres}")
+
+    if density is not None:
+        c5.metric("🧩 Interaction density", f"{density:.4f}")
+    else:
+        c5.metric("🧩 Interaction density", "N/A")
+
+    st.divider()
+
+    # =========================
+    # 2) EDA FIGURES
+    # =========================
     figs = [
         # Score distribution
         ("Histogram: Score distribution", FIG_DIR / "hist_score.png"),
@@ -856,16 +907,17 @@ def page_eda():
         ("User–Item Interaction Matrix (Sample)", FIG_DIR / "sparsity_pattern.png"),
     ]
 
+    # hiển thị theo layout 2 cột cho gọn
     for i in range(0, len(figs), 2):
         cols = st.columns(2, gap="large")
-        for col, item in zip(cols, figs[i:i + 2]):
-            name, p = item
+        for col, item in zip(cols, figs[i:i+2]):
+            title, path = item
             with col:
-                st.subheader(name)
-                if p.exists():
-                    st.image(str(p), caption=name, use_container_width=True)
+                st.subheader(title)
+                if path.exists():
+                    st.image(str(path), use_container_width=True)
                 else:
-                    st.info(f"Missing: {p.name}")
+                    st.warning(f"Missing file: {path.name}")
 
 
 
